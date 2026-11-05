@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <!-- Metadatos y enlaces a fuentes y estilos -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registro</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <style>
+        /* Variables CSS para colores y estilos base */
+        :root {
+            --primary-color: #0d3c83;
+            --primary-hover: #0a2857;
+            --secondary-color: #f8f9fa;
+            --text-color: #333;
+            --border-color: #ddd;
+            --error-color: #dc2626;
+            --success-color: #16a34a;
+        }
+        
+        .back-btn {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            z-index: 100;
+        }
+        .back-btn a {
+            color: #000000; /* Texto negro */
+            text-decoration: none;
+            font-weight: 700; /* Negrito - 700 es bold */
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 15px;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            background-color: #bb1b0c; /* Fondo blanco semitransparente */
+        }
+        .back-btn a:hover {
+            color: #000000; /* Texto blanco en hover */
+            text-decoration: none;
+        }
+        
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Poppins', sans-serif;
+        }
+        
+        /* Fondo y texto general */
+        body {
+            background-color: #f5f7fa;
+            color: var(--text-color);
+            line-height: 1.6;
+        }
+        
+        /* Contenedor principal del formulario */
+        .registro-container {
+            max-width: 800px;
+            margin: 40px auto;
+            padding: 40px;
+            background-color: #fff;
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        
+        .registro-container:hover {
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.12);
+        }
+        
+        /* Título del formulario */
+        h2 {
+            text-align: center;
+            color: var(--primary-color);
+            margin-bottom: 30px;
+            font-size: 28px;
+            font-weight: 600;
+        }
+        
+        /* Grid para organizar los campos */
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-group.full-width {
+            grid-column: 1 / -1;
+        }
+        
+        /* Etiquetas de los campos */
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: var(--text-color);
+        }
+        
+        /* Campos de entrada y select */
+        input[type="text"],
+        input[type="number"],
+        input[type="email"],
+        input[type="password"],
+        select {
+            width: 100%;
+            padding: 14px 16px;
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 15px;
+            transition: all 0.3s ease;
+            background-color: #fff;
+        }
+        
+        input:focus,
+        select:focus {
+            border-color: var(--primary-color);
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.2);
+        }
+        
+        input::placeholder {
+            color: #aaa;
+        }
+        
+        /* Botón de envío */
+        button[type="submit"] {
+            width: 100%;
+            padding: 16px;
+            font-size: 16px;
+            font-weight: 500;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            margin-top: 20px;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        button[type="submit"]:hover {
+            background-color: var(--primary-hover);
+            transform: translateY(-2px);
+        }
+        
+        /* Mensajes flash de éxito o error */
+        .flashes {
+            list-style: none;
+            padding: 0;
+            margin-bottom: 25px;
+        }
+        
+        .flashes li {
+            padding: 12px 20px;
+            border-radius: 8px;
+            margin-bottom: 12px;
+            font-weight: 500;
+            text-align: center;
+        }
+        
+        .danger {
+            background-color: #fef2f2;
+            color: #991b1b;
+            border-left: 4px solid var(--error-color);
+        }
+        
+        .success {
+            background-color: #f0fdf4;
+            color: #166534;
+            border-left: 4px solid var(--success-color);
+        }
+        
+        /* Enlace para ir a login */
+        .login-link {
+            text-align: center;
+            margin-top: 25px;
+            color: var(--text-color);
+        }
+        
+        .login-link a {
+            color: #bb1b0c;
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s ease;
+        }
+        
+        .login-link a:hover {
+            color: #bb1b0c;
+            text-decoration: underline;
+        }
+        
+        /* Pista para la contraseña */
+        .password-hint {
+            font-size: 12px;
+            color: #666;
+            margin-top: 5px;
+        }
+        
+        /* Asterisco para campos obligatorios */
+        .field-required::after {
+            content: " *";
+            color: var(--error-color);
+        }
+        
+        /* Responsividad para pantallas pequeñas */
+        @media (max-width: 768px) {
+            .registro-container {
+                padding: 25px;
+                margin: 20px;
+            }
+            
+            .form-grid {
+                grid-template-columns: 1fr;
+                gap: 15px;
+            }
+            
+            .back-btn {
+                position: relative;
+                top: auto;
+                left: auto;
+                margin: 20px;
+            }
+            
+            .back-btn a {
+                display: inline-flex;
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="back-btn">
+        <a href="{{ url_for('auth.login') }}">
+            <i class="fas fa-arrow-left"></i>Volver
+        </a>
+    </div>
+    
+    <div class="registro-container">
+        <!-- Título del formulario -->
+        <h2>Regístrate</h2>
+
+        <!-- Mensajes flash de éxito o error -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <ul class="flashes">
+                    {% for category, message in messages %}
+                        <li class="{{ category }}">{{ message }}</li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+        {% endwith %}
+
+        <!-- Formulario de registro de usuario -->
+        <form action="{{ url_for('auth.registro') }}" method="POST" class="form-grid" id="registerForm">
+            <div class="form-group">
+                <label for="nombre" class="field-required">Nombre completo</label>
+                <input type="text" id="nombre" name="nombre" value="{{ datos.nombre if datos else '' }}" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="cc" class="field-required">Cédula de ciudadanía</label>
+                <input type="text" id="cc" name="cc" value="{{ datos.cc if datos else '' }}" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="telefono" class="field-required">Teléfono</label>
+                <input type="text" id="telefono" name="telefono" value="{{ datos.telefono if datos else '' }}" required minlength="10" maxlength="15" placeholder="Ej: 3101234567">
+            </div>
+            
+            <div class="form-group">
+                <label for="sexo" class="field-required">Sexo</label>
+                <select id="sexo" name="sexo" required>
+                    <option value="">Seleccione...</option>
+                    <option value="Masculino" {% if datos and datos.sexo == 'Masculino' %}selected{% endif %}>Masculino</option>
+                    <option value="Femenino" {% if datos and datos.sexo == 'Femenino' %}selected{% endif %}>Femenino</option>
+                    <option value="Otro" {% if datos and datos.sexo == 'Otro' %}selected{% endif %}>Otro</option>
+                </select>
+            </div>
+            
+            <div class="form-group full-width">
+                <label for="correo" class="field-required">Correo electrónico</label>
+                <input type="email" id="correo" name="correo" value="{{ datos.correo if datos else '' }}" required>
+            </div>
+            
+            <div class="form-group full-width">
+                <label for="contrasena" class="field-required">Contraseña</label>
+                <input type="password" id="contrasena" name="contrasena" required>
+                <div class="password-hint">Mínimo 8 caracteres con mayúsculas, minúsculas, números y símbolos</div>
+            </div>
+            
+            <div class="form-group full-width">
+                <label for="direccion">Dirección</label>
+                <input type="text" id="direccion" name="direccion" value="{{ datos.direccion if datos else '' }}" placeholder="Ej: Calle 12 # 34-56">
+            </div>
+            
+            <div class="form-group">
+                <label for="municipio">Municipio</label>
+                <input type="text" id="municipio" name="municipio" value="{{ datos.municipio if datos else '' }}">
+            </div>
+            
+            <div class="form-group">
+                <label for="departamento">Departamento</label>
+                <input type="text" id="departamento" name="departamento" value="{{ datos.departamento if datos else '' }}">
+            </div>
+            
+            <div class="form-group full-width">
+                <button type="submit">Registrarse</button>
+            </div>
+        </form>
+        
+        <!-- Enlace para ir a login -->
+        <p class="login-link">¿Ya tienes cuenta? <a href="{{ url_for('auth.login') }}">Inicia sesión aquí</a></p>
+    </div>
+
+    <script>
+        // Manejo del historial del navegador para seguridad
+        if (window.history && window.history.pushState) {
+            window.history.pushState(null, "", window.location.href);
+            window.onpopstate = function() {
+                window.location.replace("{{ url_for('auth.logout') }}");
+            };
+        }
+
+        window.addEventListener("pageshow", function(event) {
+            if (event.persisted || (window.performance && window.performance.navigation.type === 2)) {
+                window.location.replace("{{ url_for('auth.logout') }}");
+            }
+        });
+
+        // Validación del formulario
+        function validarFormulario(e) {
+            const correo = document.getElementById('correo').value;
+            const contrasena = document.getElementById('contrasena').value;
+            const nombre = document.getElementById('nombre').value;
+            const cc = document.getElementById('cc').value;
+            const telefono = document.getElementById('telefono').value;
+            const sexo = document.getElementById('sexo').value;
+            
+            // Validar campos obligatorios
+            if (!nombre.trim() || !cc.trim() || !telefono.trim() || !correo.trim() || !contrasena.trim() || !sexo.trim()) {
+                alert("Por favor completa todos los campos obligatorios marcados con *");
+                e.preventDefault();
+                return false;
+            }
+            
+            // Validar email
+            if (!/^[\w.-]+@[\w.-]+\.[a-zA-Z]{2,}$/.test(correo)) {
+                alert("Por favor ingrese un correo electrónico válido.");
+                e.preventDefault();
+                return false;
+            }
+            
+            // Validar teléfono (solo números, mínimo 10 dígitos)
+            if (!/^\d{10,15}$/.test(telefono)) {
+                alert("El teléfono debe contener solo números y tener entre 10 y 15 dígitos.");
+                e.preventDefault();
+                return false;
+            }
+            
+            // Validar contraseña
+            if (!/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$/.test(contrasena)) {
+                alert("La contraseña debe tener al menos 8 caracteres, incluyendo mayúsculas, minúsculas, números y un carácter especial.");
+                e.preventDefault();
+                return false;
+            }
+            
+            // Validar cédula (solo números)
+            if (!/^\d+$/.test(cc)) {
+                alert("La cédula debe contener solo números.");
+                e.preventDefault();
+                return false;
+            }
+            
+            return true;
+        }
+
+        // Inicialización
+        document.addEventListener('DOMContentLoaded', function() {
+            // Validar formulario al enviar
+            document.getElementById('registerForm').addEventListener('submit', validarFormulario);
+            
+            // Formatear cédula para que solo acepte números
+            document.getElementById('cc').addEventListener('input', function(e) {
+                this.value = this.value.replace(/\D/g, '');
+            });
+            
+            // Formatear teléfono para que solo acepte números
+            document.getElementById('telefono').addEventListener('input', function(e) {
+                this.value = this.value.replace(/\D/g, '');
+            });
+        });
+    </script>
+</body>
+</html>

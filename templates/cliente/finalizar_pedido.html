@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Finalizar Pedido</title>
+    <!-- Fuente Poppins de Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Íconos FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <!-- Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <style>
+        :root {
+            --color-primario: #000000;
+            --color-secundario: #0d3c83;
+            --color-texto: #333;
+            --color-texto-claro: #555;
+            --color-fondo: #f4f7fb;
+            --color-blanco: #ffffff;
+            --color-rojo: #dc3545;
+            --sombra: 0 4px 20px rgba(0, 0, 0, 0.1);
+            --sombra-hover: 0 8px 30px rgba(0, 0, 0, 0.15);
+            --transicion: all 0.3s ease;
+        }
+
+        body {
+            background: var(--color-fondo);
+            font-family: 'Poppins', sans-serif;
+            margin: 0;
+            padding: 0;
+            color: var(--color-texto);
+        }
+
+        /* Botón de volver mejorado */
+        .btn-volver {
+            position: fixed;
+            top: 15px;
+            left: 15px;
+            z-index: 1000;
+        }
+        
+        .btn-volver a {
+            text-decoration: none;
+            color: white;
+            font-weight: 500;
+            background-color: var(--color-rojo);
+            padding: 10px 18px;
+            border-radius: 30px;
+            transition: var(--transicion);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            border: none;
+            cursor: pointer;
+            font-size: 0.95rem;
+        }
+        
+        .btn-volver a:hover {
+            background-color: #c82333;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            color: white;
+        }
+
+        .titulo-finalizar {
+            font-size: 1.8rem;
+            margin: 30px 0 25px 0;
+            color: white;
+            font-weight: 700;
+            padding: 15px 25px;
+            background: var(--color-secundario);
+            border-radius: 12px;
+            box-shadow: var(--sombra);
+            display: inline-block;
+        }
+
+        .seccion-card {
+            background: white;
+            padding: 25px;
+            border-radius: 16px;
+            box-shadow: var(--sombra);
+            transition: var(--transicion);
+            border: 1px solid rgba(0,0,0,0.03);
+            height: 100%;
+        }
+
+        .seccion-card:hover {
+            box-shadow: var(--sombra-hover);
+        }
+
+        .seccion-titulo {
+            color: var(--color-secundario);
+            font-weight: 700;
+            font-size: 1.3rem;
+            margin-bottom: 20px;
+            padding-bottom: 12px;
+            border-bottom: 2px solid #e9ecef;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .seccion-titulo i {
+            font-size: 1.2rem;
+        }
+
+        .form-group {
+            margin-bottom: 18px;
+        }
+
+        .form-label {
+            font-weight: 600;
+            color: var(--color-texto);
+            margin-bottom: 8px;
+            font-size: 0.95rem;
+        }
+
+        .form-control, .form-select {
+            padding: 12px 15px;
+            border-radius: 10px;
+            border: 1px solid #d0d6df;
+            font-size: 0.95rem;
+            transition: var(--transicion);
+            background: #fafafa;
+        }
+
+        .form-control:focus, .form-select:focus {
+            border-color: var(--color-secundario);
+            box-shadow: 0 0 0 3px rgba(13, 60, 131, 0.1);
+            background: white;
+        }
+
+        .producto-img {
+            width: 70px;
+            height: 70px;
+            object-fit: contain;
+            border-radius: 10px;
+            border: 1px solid #eee;
+            padding: 5px;
+            background: white;
+        }
+
+        .linea-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 0;
+            border-bottom: 1px solid #e8e8e8;
+            transition: var(--transicion);
+        }
+
+        .linea-item:hover {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 15px 10px;
+        }
+
+        .linea-item:last-child {
+            border-bottom: none;
+        }
+
+        .producto-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            flex: 1;
+        }
+
+        .producto-nombre {
+            font-weight: 600;
+            color: var(--color-texto);
+            margin-bottom: 4px;
+        }
+
+        .producto-precio {
+            color: var(--color-texto-claro);
+            font-size: 0.9rem;
+        }
+
+        .producto-total {
+            text-align: right;
+            min-width: 120px;
+        }
+
+        .cantidad-precio {
+            color: var(--color-texto-claro);
+            font-size: 0.9rem;
+        }
+
+        .subtotal {
+            font-weight: 700;
+            color: var(--color-secundario);
+            font-size: 1.1rem;
+        }
+
+        .total-section {
+            background: linear-gradient(135deg, #f0f8ff 0%, #e3f2fd 100%);
+            padding: 20px;
+            border-radius: 12px;
+            margin-top: 20px;
+            border-left: 4px solid var(--color-secundario);
+        }
+
+        .total-text {
+            font-size: 1.5rem;
+            color: var(--color-secundario);
+            font-weight: 700;
+            margin: 0;
+            text-align: center;
+        }
+
+        .btn-finalizar {
+            background: var(--color-secundario);
+            color: white;
+            padding: 15px;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            width: 100%;
+            border: none;
+            transition: var(--transicion);
+            margin-top: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .btn-finalizar:hover {
+            background: #0b316d;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(13, 60, 131, 0.3);
+        }
+
+        .container {
+            margin-top: 20px;
+        }
+
+        /* Responsividad */
+        @media (max-width: 768px) {
+            .btn-volver {
+                position: relative;
+                top: 0;
+                left: 0;
+                margin-bottom: 15px;
+                text-align: center;
+            }
+            
+            .btn-volver a {
+                display: inline-flex;
+                justify-content: center;
+            }
+            
+            .container {
+                margin-top: 10px;
+            }
+            
+            .titulo-finalizar {
+                font-size: 1.5rem;
+                padding: 12px 20px;
+                margin: 20px 0;
+                width: 100%;
+                text-align: center;
+            }
+            
+            .producto-info {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 8px;
+            }
+            
+            .producto-total {
+                text-align: left;
+                width: 100%;
+                margin-top: 10px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<!-- Botón de volver mejorado -->
+<div class="btn-volver">
+    {% if publico %}
+        <a href="/">
+            <i class="fas fa-arrow-left"></i> Volver
+        </a>
+    {% else %}
+        <a href="{{ url_for('cliente.dashboard') }}">
+            <i class="fas fa-arrow-left"></i> Volver
+        </a>
+    {% endif %}
+</div>
+
+<div class="container py-4">
+    <h3 class="titulo-finalizar">
+        <i class="fas fa-shopping-bag"></i> Finalizar Pedido
+    </h3>
+
+    <form method="POST" action="{{ url_for('cliente.crear_pedido') }}">
+        <div class="row">
+            <!-- DATOS DEL ENVÍO -->
+            <div class="col-lg-7 mb-4">
+                <div class="seccion-card">
+                    <h5 class="seccion-titulo">
+                        <i class="fas fa-truck"></i> Datos de Envío
+                    </h5>
+
+                    <div class="form-group">
+                        <label class="form-label">Nombre del receptor</label>
+                        <input type="text" class="form-control" name="nombre_receptor" value="{{ datos_cliente.nombre }}" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Dirección de entrega</label>
+                        <input type="text" class="form-control" name="direccion_entrega" value="{{ datos_cliente.direccion }}" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Ciudad</label>
+                        <input type="text" class="form-control" name="ciudad_entrega" value="{{ datos_cliente.ciudad }}" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Teléfono de contacto</label>
+                        <input type="tel" class="form-control" name="telefono_receptor" value="{{ datos_cliente.telefono }}">
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Forma de pago</label>
+                        <select name="forma_pago" class="form-select" required>
+                            <option value="Contado">Contado</option>
+                            <option value="Crédito">Crédito</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Observaciones adicionales</label>
+                        <textarea name="observaciones" class="form-control" rows="3" placeholder="Instrucciones especiales para la entrega..."></textarea>
+                    </div>
+                </div>
+            </div>
+
+            <!-- RESUMEN DEL PEDIDO -->
+            <div class="col-lg-5">
+                <div class="seccion-card">
+                    <h5 class="seccion-titulo">
+                        <i class="fas fa-receipt"></i> Resumen del Pedido
+                    </h5>
+
+                    <div class="productos-lista">
+                        {% for it in carrito %}
+                        <div class="linea-item">
+                            <div class="producto-info">
+                                <img src="{{ url_for('static', filename='imagenes_productos/' ~ (it.imagen or 'default.png')) }}" 
+                                     class="producto-img" alt="{{ it.nombre }}">
+                                <div>
+                                    <div class="producto-nombre">{{ it.nombre }}</div>
+                                    <div class="producto-precio">${{ "{:,.0f}".format(it.precio) }} c/u</div>
+                                </div>
+                            </div>
+                            <div class="producto-total">
+                                <div class="cantidad-precio">{{ it.cantidad }} x ${{ "{:,.0f}".format(it.precio) }}</div>
+                                <div class="subtotal">${{ "{:,.0f}".format(it.precio * it.cantidad) }}</div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+
+                    <div class="total-section">
+                        <p class="total-text">
+                            Total: ${{ "{:,.0f}".format(total) }}
+                        </p>
+                    </div>
+
+                    <button class="btn-finalizar" type="submit">
+                        <i class="fas fa-check-circle"></i> Confirmar y Crear Pedido
+                    </button>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+
+</body>
+</html>

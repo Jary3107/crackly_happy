@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pedidos Pagados - Facturación</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body {
+            background: linear-gradient(135deg, #ffffff 0%, #ffffff 100%);
+            min-height: 100vh;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        .container-fluid {
+            padding: 2rem;
+        }
+        .header-section {
+            background: white;
+            border-radius: 15px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .filters-section {
+            background: white;
+            border-radius: 10px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        .table-container {
+            background: white;
+            border-radius: 10px;
+            padding: 1.5rem;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        .badge-pagado {
+            background-color: #28a745;
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.9rem;
+        }
+        
+        /* Styles for the back button */
+        .btn-volver {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            z-index: 1000;
+            background-color: #dc3545;
+            border-color: #dc3545;
+            color: white;
+            padding: 0.5rem 1rem;
+            font-weight: 500;
+        }
+        .btn-volver:hover {
+            background-color: #c82333;
+            border-color: #bd2130;
+            color: white;
+        }
+        
+        .logout-btn {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+        }
+    </style>
+</head>
+<body>
+    <!-- Back button positioned top left -->
+    <a href="{{ url_for('facturacion.dashboard') }}" class="btn btn-volver">
+        <i class="fas fa-arrow-left"></i> Volver
+    </a>
+
+    <div class="container-fluid" style="margin-top: 80px;">
+        <div class="header-section">
+            <h1 class="mb-0">
+                <i class="fas fa-check-circle text-success"></i> Pedidos Pagados
+            </h1>
+            <p class="text-muted mb-0">Usuario: {{ nombre }} | Área: Facturación</p>
+        </div>
+
+        <!-- Added flash message display section for pagados tab -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <!-- Only show messages for this specific tab (pagados) -->
+                    {% if category == 'success_pagados' or category == 'danger' or category == 'warning' or category == 'info' %}
+                        <div class="alert alert-{{ 'success' if category == 'success_pagados' else category }} alert-dismissible fade show" role="alert">
+                            {{ message }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+                    {% endif %}
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        <div class="filters-section">
+            <form method="GET" action="{{ url_for('facturacion.ver_pedidos_pagados') }}">
+                <div class="row g-3">
+                    <div class="col-md-3">
+                        <label class="form-label">Fecha Desde</label>
+                        <input type="date" class="form-control" name="fecha_desde" value="{{ fecha_desde }}">
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label">Fecha Hasta</label>
+                        <input type="date" class="form-control" name="fecha_hasta" value="{{ fecha_hasta }}">
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label">Ordenar por</label>
+                        <select class="form-select" name="sort_by">
+                            <option value="fecha" {% if sort_by == 'fecha' %}selected{% endif %}>Fecha</option>
+                            <option value="cliente" {% if sort_by == 'cliente' %}selected{% endif %}>Cliente</option>
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label">Orden</label>
+                        <select class="form-select" name="order">
+                            <option value="desc" {% if order == 'desc' %}selected{% endif %}>Descendente</option>
+                            <option value="asc" {% if order == 'asc' %}selected{% endif %}>Ascendente</option>
+                        </select>
+                    </div>
+                    <div class="col-12">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-filter"></i> Aplicar Filtros
+                        </button>
+                        <a href="{{ url_for('facturacion.ver_pedidos_pagados') }}" class="btn btn-secondary">
+                            <i class="fas fa-redo"></i> Limpiar
+                        </a>
+                    </div>
+                </div>
+            </form>
+        </div>
+
+        <div class="table-container">
+            <h4 class="mb-3">Lista de Pedidos Pagados ({{ pedidos|length }})</h4>
+            
+            {% if pedidos %}
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Número Pedido</th>
+                            <th>Fecha</th>
+                            <th>Cliente</th>
+                            <th>Ciudad Entrega</th>
+                            <th>Estado</th>
+                            <th>Estado Pago</th>
+                            <th>Forma Pago</th>
+                            <th>Valor Total</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for pedido in pedidos %}
+                        <tr>
+                            <td><strong>{{ pedido.numero_pedido }}</strong></td>
+                            <td>{{ pedido.fecha_pedido.strftime('%d/%m/%Y') if pedido.fecha_pedido else 'N/A' }}</td>
+                            <td>{{ pedido.razon_social }}</td>
+                            <td>{{ pedido.ciudad_entrega or 'N/A' }}</td>
+                            <td>
+                                <span class="badge bg-info">{{ pedido.estado }}</span>
+                            </td>
+                            <td>
+                                <span class="badge-pagado">{{ pedido.estado_pago }}</span>
+                            </td>
+                            <td>{{ pedido.forma_pago or 'N/A' }}</td>
+                            <td>${{ "{:,.2f}".format(pedido.valor_total) if pedido.valor_total else '0.00' }}</td>
+                            <td>
+                                <a href="{{ url_for('facturacion.detalle_pedido', id_pedido=pedido.id_pedido, from='pagados') }}" 
+                                    class="btn btn-sm btn-primary mb-1">
+                                    <i class="fas fa-eye"></i> Ver
+                                </a>
+                             {% if pedido.estado_pago == 'Pagado' %}
+    <!-- Botón para generar factura -->
+    <a href="{{ url_for('facturacion.generar_factura', id_pedido=pedido.id_pedido) }}" 
+        class="btn btn-sm btn-success mb-1">
+        <i class="fas fa-file-invoice"></i> Generar factura
+    </a>
+   <a href="{{ url_for('facturacion.enviar_factura', pedido_id=pedido.id_pedido) }}" 
+   class="btn btn-sm btn-primary" style="display:inline;">
+   <i class="fas fa-envelope"></i> Enviar correo
+</a>
+    <!-- Formulario para archivar -->
+    <form action="{{ url_for('facturacion.archivar_desde_factura', id_pedido=pedido.id_pedido) }}" 
+          method="post" style="display:inline;">
+        <button type="submit" class="btn btn-sm btn-warning mb-1">
+            <i class="fas fa-box-archive"></i> Archivar
+        </button>
+    </form>
+{% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="alert alert-info">
+                <i class="fas fa-info-circle"></i> No se encontraron pedidos pagados con los filtros aplicados.
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

@@ -1,0 +1,52 @@
+pip install Flask
+
+pip install bcrypt
+
+pip install mysql-connector-python
+
+pip install python-dotenv
+
+pip install mysqlclient
+
+pip install flask reportlab
+
+pip install flask flask-mail mysql-connector-python pdfkit weasyprint fpdf
+
+pip install google-genai
+
+pip install google-generativeai
+
+pip install markdown2
+
+descargar y si no les aparece configurarlo en las variables de entorno  
+
+https://wkhtmltopdf.org/downloads.html
+
+prueban primero si les instalo y si esta en sus pc 
+
+wkhtmltopdf --versión
+
+tienen que aparecerles así
+ 
+wkhtmltopdf 0.12.6 (with patched qt)
+
+si no hacen esto Busca en el menú Inicio: “Editar las variables de entorno del sistema”
+
+Haz clic en “Variables de entorno…”
+
+En la parte inferior (Variables del sistema), busca la variable llamada Path y haz clic en Editar
+
+Haz clic en Nuevo
+
+Pega esta ruta:
+
+C:\Program Files\wkhtmltopdf\bin
+
+
+Acepta todo con Aceptar hasta cerrar todas las ventanas.
+
+Cierra y vuelve a abrir la terminal (CMD o PowerShell).
+
+Escribe nuevamente:
+
+wkhtmltopdf --version

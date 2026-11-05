@@ -1,0 +1,143 @@
+USE CookieDB;
+
+CREATE TABLE usuarios (
+  id_usuario INT AUTO_INCREMENT PRIMARY KEY,
+  nombre VARCHAR(100) NOT NULL,
+  cc VARCHAR(20) UNIQUE,
+  telefono VARCHAR(20),
+  correo VARCHAR(100) UNIQUE NOT NULL,
+  rol ENUM('Cliente', 'Comercial', 'Produccion', 'Facturacion', 'Admin') NOT NULL, 
+  contrasena VARCHAR(255) NOT NULL,
+  direccion VARCHAR(150),
+  municipio VARCHAR(80),
+  departamento VARCHAR(80),
+  sexo ENUM('Masculino','Femenino','Otro'),
+  fecha_creacion DATETIME DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE tokens (
+  id_token INT AUTO_INCREMENT PRIMARY KEY,
+  id_usuario INT NOT NULL,
+  token VARCHAR(255) NOT NULL,
+  fecha_expiracion DATETIME NOT NULL,
+  FOREIGN KEY (id_usuario) REFERENCES usuarios(id_usuario) ON DELETE CASCADE
+);
+
+CREATE TABLE clientes (
+  id_cliente INT AUTO_INCREMENT PRIMARY KEY,
+  tipo_cliente ENUM('Empresa','Persona') NOT NULL,
+  razon_social VARCHAR(150),
+  nit_cc VARCHAR(30),
+  direccion VARCHAR(150),
+  ciudad VARCHAR(80),
+  telefono VARCHAR(20),
+  correo VARCHAR(100),
+  contacto VARCHAR(100),
+  telefono_contacto VARCHAR(20)
+);
+
+CREATE TABLE lineas_producto (
+  id_linea INT AUTO_INCREMENT PRIMARY KEY,
+  nombre_linea VARCHAR(80) NOT NULL,
+  descripcion VARCHAR(200)
+);
+
+CREATE TABLE productos (
+  id_producto INT AUTO_INCREMENT PRIMARY KEY,
+  id_linea INT,
+  nombre_producto VARCHAR(100) NOT NULL,
+  descripcion TEXT,
+  precio DECIMAL(10,2) NOT NULL,
+  stock INT DEFAULT 0,
+  imagen VARCHAR(255),
+  FOREIGN KEY (id_linea) REFERENCES lineas_producto(id_linea)
+);
+
+CREATE TABLE pedidos (
+  id_pedido INT AUTO_INCREMENT PRIMARY KEY,
+  id_cliente INT NOT NULL,
+  id_vendedor INT,
+  numero_pedido VARCHAR(20) UNIQUE,
+  fecha_pedido DATE NOT NULL,
+  ciudad_entrega VARCHAR(80),
+  direccion_entrega VARCHAR(150),
+  forma_pago ENUM('Contado','Crédito') NOT NULL,
+  estado ENUM('Pendiente','Programado','Producción','Enviado','Archivado') DEFAULT 'Pendiente',
+  estado_pago ENUM('No Pagado','Pagado','Crédito') DEFAULT 'No Pagado',
+  valor_total DECIMAL(12,2),
+  observaciones TEXT,
+  FOREIGN KEY (id_cliente) REFERENCES clientes(id_cliente),
+  FOREIGN KEY (id_vendedor) REFERENCES usuarios(id_usuario)
+);
+
+CREATE TABLE detalle_pedido (
+  id_detalle INT AUTO_INCREMENT PRIMARY KEY,
+  id_pedido INT NOT NULL,
+  id_producto INT NOT NULL,
+  cantidad INT NOT NULL,
+  precio_unitario DECIMAL(10,2),
+  subtotal DECIMAL(12,2),
+  tiro_mensaje TEXT,
+  retiro_mensaje TEXT,
+  mensajes_mezclados ENUM('Sí','No'),
+  inserto ENUM('Sí','No'),
+  empaque VARCHAR(80),
+  cenefa ENUM('Sí','No'),
+  observacion TEXT,
+  FOREIGN KEY (id_pedido) REFERENCES pedidos(id_pedido) ON DELETE CASCADE,
+  FOREIGN KEY (id_producto) REFERENCES productos(id_producto)
+);
+
+CREATE TABLE facturas (
+  id_factura INT AUTO_INCREMENT PRIMARY KEY,
+  id_pedido INT NOT NULL,
+  numero_factura VARCHAR(30) UNIQUE,
+  fecha_factura DATE NOT NULL,
+  subtotal DECIMAL(12,2),
+  iva DECIMAL(12,2),
+  total DECIMAL(12,2),
+  forma_pago ENUM('Contado','Crédito','Transferencia'),
+  estado_factura ENUM('Emitida','Enviada','Pagada') DEFAULT 'Emitida',
+  FOREIGN KEY (id_pedido) REFERENCES pedidos(id_pedido)
+);
+
+CREATE TABLE envios (
+  id_envio INT AUTO_INCREMENT PRIMARY KEY,
+  id_pedido INT NOT NULL,
+  transportadora VARCHAR(100),
+  numero_guia VARCHAR(50),
+  sale_via ENUM('Transportadora','Mensajero','Recogen'),
+  pago_flete ENUM('Cliente','Empresa') DEFAULT 'Cliente',
+  estado_salida ENUM('Sí','No') DEFAULT 'No',
+  nombre_receptor VARCHAR(100),
+  telefono_receptor VARCHAR(20),
+  fecha_envio DATE,
+  fecha_entrega DATE,
+  instrucciones TEXT,
+  FOREIGN KEY (id_pedido) REFERENCES pedidos(id_pedido)
+);
+
+CREATE TABLE produccion (
+  id_produccion INT AUTO_INCREMENT PRIMARY KEY,
+  id_pedido INT NOT NULL,
+  id_responsable INT,
+  estado ENUM('En producción','Finalizado','Pausado') DEFAULT 'En producción',
+  fecha_inicio DATE,
+  fecha_fin DATE,
+  observaciones TEXT,
+  FOREIGN KEY (id_pedido) REFERENCES pedidos(id_pedido),
+  FOREIGN KEY (id_responsable) REFERENCES usuarios(id_usuario)
+);
+
+CREATE TABLE
+  `pagos` (
+    `id_pago` INT AUTO_INCREMENT PRIMARY KEY,
+    `id_pedido` INT NOT NULL,
+    `id_usuario` INT NULL,
+    `fecha_subida` DATETIME DEFAULT CURRENT_TIMESTAMP,
+    `tipo_archivo` VARCHAR(50),
+    `comprobante` LONGBLOB,
+    `observaciones` TEXT,
+    CONSTRAINT `fk_pagos_pedidos` FOREIGN KEY (`id_pedido`) REFERENCES `pedidos` (`id_pedido`) ON DELETE CASCADE,
+    CONSTRAINT `fk_pagos_usuarios` FOREIGN KEY (`id_usuario`) REFERENCES `usuarios` (`id_usuario`) ON DELETE SET NULL
+  );

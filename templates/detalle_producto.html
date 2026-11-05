@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ producto.nombre_producto }}</title>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #fafafa;
+            margin: 0;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 40px auto;
+            background: white;
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .titulo {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #0d3c83;
+            text-align: center;
+        }
+
+        .producto-imagen {
+            width: 100%;
+            max-height: 350px;
+            object-fit: contain;
+            background: #eee;
+            border-radius: 12px;
+            padding: 10px;
+        }
+
+        .precio {
+            font-size: 1.6rem;
+            color: #bb1b0c;
+            font-weight: bold;
+            margin: 20px 0;
+        }
+
+        .descripcion {
+            font-size: 1rem;
+            line-height: 1.6;
+            color: #333;
+            white-space: pre-line;
+            margin-bottom: 20px;
+        }
+
+        .btn-volver {
+    position: fixed;
+    top: 15px;
+    left: 15px;
+    background: #bb1b0c;
+    color: white;
+    padding: 10px 18px;
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: bold;
+    z-index: 1000;
+}
+
+.btn-volver:hover {
+    background: #a11308;
+}
+
+
+        .btn-carrito {
+            display: inline-block;
+            background: #0d3c83;
+            color: white;
+            padding: 12px 25px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        /* Botón estilo Crackly */
+        .btn-crackly {
+            background-color: #0d3c83;
+            border: none;
+            color: #fff;
+            padding: 10px 18px;
+            font-size: 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: 0.18s ease;
+            font-weight: 600;
+        }
+
+        .btn-crackly:hover {
+            background-color: #094076;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 10px rgba(13, 60, 131, 0.18);
+        }
+
+        .btn-crackly:active {
+            transform: translateY(0);
+            box-shadow: none;
+        }
+
+        /* Input Cantidad */
+        .input-cantidad {
+            width: 100px;
+            padding: 8px;
+            border: 2px solid #0d3c83;
+            border-radius: 6px;
+            font-size: 15px;
+            font-weight: 500;
+            color: #0d3c83;
+            outline: none;
+            transition: 0.18s ease;
+            margin-right: 12px;
+        }
+
+        .input-cantidad:focus {
+            border-color: #094076;
+            box-shadow: 0 0 6px rgba(13, 60, 131, 0.2);
+        }
+
+        /* Layout del form: cantidad + botón al mismo nivel */
+        .form-line {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-top: 12px;
+        }
+
+        /* Mensajes flash inline */
+        .flash-success {
+            padding: 12px 20px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            font-weight: bold;
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .flash-danger {
+            padding: 12px 20px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            font-weight: bold;
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+    </style>
+</head>
+
+<body>
+
+<!-- BOTÓN VOLVER -->
+<a href="{{ url_for('public.catalogo_publico') if publico else url_for('cliente.catalogo_cliente') }}" 
+   class="btn-volver">
+     Volver
+</a>
+
+<div class="container">
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        {% for category, message in messages %}
+          <div class="{{ 'flash-success' if category == 'success' else 'flash-danger' }}">
+            {{ message }}
+          </div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+
+    <h2 class="titulo">{{ producto.nombre_producto }}</h2>
+
+    <img src="{{ url_for('static', filename='imagenes_productos/' ~ producto.imagen) }}" class="producto-imagen" alt="{{ producto.nombre_producto }}">
+
+    <div class="precio">$ {{ "{:,.0f}".format(producto.precio) }}</div>
+
+    <div class="descripcion">{{ producto.descripcion }}</div>
+
+    {% if not publico %}
+
+    <!-- FORMULARIO TRADICIONAL (POST) - este SI funciona con tu endpoint actual -->
+    <form action="{{ url_for('cliente.agregar_carrito') }}" method="POST">
+        <!-- si usas CSRF token (Flask-WTF) incluye: -->
+        {%- if csrf_token is defined -%}
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        {%- endif -%}
+
+        <input type="hidden" name="producto_id" value="{{ producto.id_producto }}">
+        <input type="hidden" name="nombre" value="{{ producto.nombre_producto }}">
+        <input type="hidden" name="precio" value="{{ producto.precio }}">
+        <input type="hidden" name="imagen" value="{{ producto.imagen }}">
+        <input type="hidden" name="descripcion" value="{{ producto.descripcion }}">
+
+        <div class="form-line">
+            <label for="cantidad" style="font-weight:600;">Cantidad:</label>
+            <input type="number" id="cantidad" name="cantidad" value="1" min="1" class="input-cantidad">
+
+            <button type="submit" class="btn-crackly">Agregar al carrito</button>
+        </div>
+    </form>
+
+    {% else %}
+        <!-- Visitante público -->
+        <a href="{{ url_for('auth.login') }}" class="btn-carrito" style="background:#bb1b0c;">
+            Inicia sesión para comprar
+        </a>
+    {% endif %}
+
+</div>
+
+</body>
+</html>
+

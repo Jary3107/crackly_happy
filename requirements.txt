@@ -1,0 +1,10 @@
+Flask
+bcrypt
+mysql-connector-python
+python-dotenv
+Flask-Mail
+google-generativeai
+markdown2
+reportlab
+pdfkit
+weasyprint

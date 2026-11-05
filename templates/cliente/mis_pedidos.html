@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Mis Pedidos</title>
+    <!-- Fuente Poppins de Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Íconos FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
+    <style>
+        :root {
+            --color-primario: #000000;
+            --color-secundario: #0d3c83;
+            --color-texto: #333;
+            --color-texto-claro: #555;
+            --color-fondo: #f4f7fb;
+            --color-blanco: #ffffff;
+            --color-rojo: #dc3545;
+            --sombra: 0 4px 20px rgba(0, 0, 0, 0.1);
+            --transicion: all 0.3s ease;
+        }
+
+        body {
+            background: var(--color-fondo);
+            font-family: 'Poppins', sans-serif;
+            margin: 0;
+            padding: 0;
+            color: var(--color-texto);
+            line-height: 1.5;
+        }
+
+        .container {
+            width: 90%;
+            max-width: 1000px;
+            margin: 30px auto;
+        }
+
+        /* Botón de volver mejorado */
+        .btn-volver {
+            position: fixed;
+            top: 15px;
+            left: 15px;
+            z-index: 1000;
+        }
+        
+        .btn-volver a {
+            text-decoration: none;
+            color: white;
+            font-weight: 500;
+            background-color: var(--color-rojo);
+            padding: 10px 18px;
+            border-radius: 30px;
+            transition: var(--transicion);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            border: none;
+            cursor: pointer;
+            font-size: 0.95rem;
+        }
+        
+        .btn-volver a:hover {
+            background-color: #c82333;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            color: white;
+        }
+
+        /* Título más compacto */
+        .titulo-principal {
+            font-size: 1.8rem;
+            color: var(--color-secundario);
+            font-weight: 700;
+            margin: 10px 0 20px 0;
+            text-align: center;
+        }
+
+        /* Filtros más compactos */
+        .filtro-box {
+            background: var(--color-blanco);
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 12px;
+            box-shadow: var(--sombra);
+        }
+
+        .filtro-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            align-items: end;
+        }
+
+        .filtro-item {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .filtro-label {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--color-secundario);
+            margin-bottom: 6px;
+        }
+
+        .filtro-input {
+            padding: 8px 12px;
+            border-radius: 8px;
+            border: 1px solid #d0d6df;
+            font-size: 0.9rem;
+            background: #fff;
+            outline: none;
+            transition: var(--transicion);
+        }
+
+        .filtro-input:focus {
+            box-shadow: 0 0 0 2px rgba(13, 60, 131, 0.1);
+            border-color: var(--color-secundario);
+        }
+
+        .btn-filtrar {
+            background: var(--color-secundario);
+            color: white;
+            padding: 9px 15px;
+            border-radius: 8px;
+            border: none;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transicion);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            font-size: 0.9rem;
+        }
+
+        .btn-filtrar:hover {
+            background: #0b316d;
+            transform: translateY(-1px);
+        }
+
+        /* Tarjetas de pedidos más compactas */
+        .pedido-card {
+            background: var(--color-blanco);
+            border-radius: 12px;
+            padding: 18px;
+            margin-bottom: 15px;
+            box-shadow: var(--sombra);
+            transition: var(--transicion);
+        }
+
+        .pedido-card:hover {
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+        }
+
+        .pedido-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 10px;
+        }
+
+        .pedido-info {
+            flex: 1;
+        }
+
+        .pedido-id {
+            font-weight: 700;
+            color: var(--color-secundario);
+            font-size: 1.1rem;
+            margin-bottom: 5px;
+        }
+
+        .pedido-fecha {
+            color: var(--color-texto-claro);
+            font-size: 0.9rem;
+        }
+
+        .pedido-total {
+            font-weight: 700;
+            color: var(--color-secundario);
+            font-size: 1.2rem;
+            text-align: right;
+        }
+
+        .pedido-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 10px;
+            padding-top: 10px;
+            border-top: 1px solid #eee;
+        }
+
+        /* Badges de estado */
+        .badge-estado {
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            display: inline-block;
+        }
+        
+        .estado-pendiente { background-color: #ffc107; color: #000; }
+        .estado-programado { background-color: #17a2b8; color: #fff; }
+        .estado-produccion { background-color: #fd7e14; color: #fff; }
+        .estado-enviado { background-color: #28a745; color: #fff; }
+        .estado-archivado { background-color: #6c757d; color: #fff; }
+        
+        /* Información de seguimiento */
+        .tracking-info {
+            background: #e3f2fd;
+            padding: 8px 12px;
+            border-radius: 6px;
+            margin-top: 10px;
+            border-left: 3px solid var(--color-secundario);
+        }
+        
+        .tracking-label {
+            font-weight: 600;
+            color: var(--color-secundario);
+            font-size: 0.85rem;
+        }
+        
+        .tracking-number {
+            font-size: 0.95rem;
+            color: #333;
+            font-weight: 600;
+            margin-top: 3px;
+        }
+
+        .btn-detalle {
+            background: var(--color-secundario);
+            color: white;
+            padding: 6px 12px;
+            border-radius: 6px;
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 0.85rem;
+            transition: var(--transicion);
+        }
+
+        .btn-detalle:hover {
+            background: #0b316d;
+            color: white;
+        }
+
+        /* Mensaje sin pedidos */
+        .sin-pedidos {
+            text-align: center;
+            color: var(--color-texto-claro);
+            font-weight: 500;
+            margin-top: 30px;
+            padding: 20px;
+            background: var(--color-blanco);
+            border-radius: 12px;
+            box-shadow: var(--sombra);
+        }
+
+        /* Responsividad */
+        @media (max-width: 768px) {
+            .container {
+                width: 95%;
+                margin: 50px auto 20px;
+            }
+            
+            .filtro-grid {
+                grid-template-columns: 1fr;
+                gap: 12px;
+            }
+            
+            .btn-volver {
+                position: relative;
+                top: 0;
+                left: 0;
+                margin-bottom: 15px;
+                text-align: center;
+            }
+            
+            .btn-volver a {
+                display: inline-flex;
+                justify-content: center;
+            }
+            
+            .pedido-header {
+                flex-direction: column;
+                gap: 10px;
+            }
+            
+            .pedido-total {
+                text-align: left;
+            }
+            
+            .pedido-footer {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<!-- Botón de volver mejorado -->
+<div class="btn-volver">
+    <a href="{{ url_for('cliente.dashboard') }}">
+        <i class="fas fa-arrow-left"></i> Volver
+    </a>
+</div>
+
+<div class="container">
+    <h2 class="titulo-principal">Mis Pedidos</h2>
+
+    <!-- Filtros -->
+    <form method="GET" action="{{ url_for('cliente.mis_pedidos') }}" class="filtro-box" autocomplete="off">
+        <div class="filtro-grid">
+            <div class="filtro-item">
+                <label class="filtro-label">Fecha desde</label>
+                <input type="date" class="filtro-input" name="fecha_desde" value="{{ fecha_desde or request.args.get('fecha_desde','') }}">
+            </div>
+
+            <div class="filtro-item">
+                <label class="filtro-label">Fecha hasta</label>
+                <input type="date" class="filtro-input" name="fecha_hasta" value="{{ fecha_hasta or request.args.get('fecha_hasta','') }}">
+            </div>
+
+            <div class="filtro-item">
+                <button type="submit" class="btn-filtrar">
+                    <i class="fas fa-filter"></i> Filtrar
+                </button>
+            </div>
+        </div>
+    </form>
+
+    <!-- Lista de pedidos -->
+    {% for p in pedidos %}
+    <div class="pedido-card">
+        <div class="pedido-header">
+            <div class="pedido-info">
+                <div class="pedido-id">Pedido #{{ p.id_pedido }}</div>
+                <div class="pedido-fecha">{{ p.fecha }}</div>
+            </div>
+            <div class="pedido-total">${{ p.total }}</div>
+        </div>
+        
+        <div class="pedido-footer">
+            <div>
+                <span class="badge-estado estado-{{ p.estado.lower() }}">
+                    {{ p.estado }}
+                </span>
+            </div>
+            <a href="{{ url_for('cliente.detalle_pedido', id_pedido=p.id_pedido) }}" class="btn-detalle">
+                Ver Detalle
+            </a>
+        </div>
+        
+        <!-- Información de seguimiento si está enviado -->
+        {% if p.estado == 'Enviado' and p.numero_guia %}
+        <div class="tracking-info">
+            <div class="tracking-label">
+                <i class="fas fa-truck"></i> Número de Guía
+            </div>
+            <div class="tracking-number">{{ p.numero_guia }}</div>
+        </div>
+        {% endif %}
+    </div>
+    {% endfor %}
+
+    {% if pedidos|length == 0 %}
+        <div class="sin-pedidos">
+            No tienes pedidos registrados.
+        </div>
+    {% endif %}
+</div>
+
+</body>
+</html>

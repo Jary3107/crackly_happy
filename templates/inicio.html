@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <!-- Metadatos y enlaces a fuentes, estilos y responsividad -->
+    <meta charset="UTF-8">
+    <title>Crackly Happy</title>
+    <!-- Hoja de estilos personalizada -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <!-- Fuente Poppins de Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Íconos FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        /* Variables CSS para colores y sombras */
+        :root {
+            --color-primario: #000000;
+            --color-secundario: #0d3c83;
+            --color-texto: #333;
+            --color-texto-claro: #555;
+            --color-fondo: #ffffff;
+            --color-blanco: #ffffff;
+            --sombra: 0 4px 20px rgba(0, 0, 0, 0.1);
+            --transicion: all 0.3s ease;
+        }
+        /* Estilos generales del body */
+        body {
+            margin: 0;
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--color-fondo);
+            color: var(--color-texto);
+            line-height: 1.6;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+        /* Encabezado con logo y botones */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 5%;
+            background-image: url("{{ url_for('static', filename='images/banner_inicio.png') }}");
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            box-shadow: var(--sombra);
+            min-height: 80px;
+            position: relative;
+        }
+        
+        /* Contenedor del logo y botón Ver Catálogo */
+        .logo-container {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            z-index: 2;
+        }
+        
+        /* Logo de la empresa */
+        .logo {
+            height: 100px;
+            transition: var(--transicion);
+        }
+        .logo:hover {
+            transform: scale(1.05);
+        }
+        
+        /* Estilos para el botón Ver Catálogo con color azul */
+        .btn-catalogo {
+            text-decoration: none;
+            color: var(--color-blanco);
+            font-weight: 500;
+            background-color: var(--color-secundario);
+            padding: 12px 24px;
+            border-radius: 30px;
+            transition: var(--transicion);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        .btn-catalogo:hover {
+            background-color: #032550;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+        .btn-catalogo i {
+            font-size: 16px;
+        }
+        
+        /* Contenedor de los botones de navegación */
+        .header-buttons {
+            display: flex;
+            gap: 20px;
+            z-index: 2;
+        }
+        /* Estilos de los botones de navegación */
+        .header-buttons a {
+            text-decoration: none;
+            color: var(--color-blanco);
+            font-weight: 500;
+            background-color: var(--color-secundario);
+            padding: 12px 24px;
+            border-radius: 30px;
+            transition: var(--transicion);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        .header-buttons a:hover {
+            background-color: #032550;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+        .header-buttons a i {
+            font-size: 16px;
+        }
+        /* Contenedor principal de la imagen central */
+        .contenido-imagen {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-grow: 1;
+            padding: 40px 5%;
+        }
+        /* Imagen central de la página */
+        .imagen-sola {
+            max-width: 400px;
+            width: 100%;
+            animation: fadeIn 1s ease;
+        }
+        .imagen-sola img {
+            width: 100%;
+            height: auto;
+            border-radius: 10px;
+            box-shadow: var(--sombra);
+        }
+        /* Animación de aparición */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        /* Added styles for company info section */
+        .about-section {
+            background-color: #f9f9f9;
+            padding: 60px 5%;
+            text-align: center;
+            /* Adding fortune cookies pattern background */
+            background-image: url('https://hebbkx1anhila5yf.public.blob.vercel-storage.com/image-YI3MazbTwU3oNiFHNWyEpBBsNfyGQG.png');
+            background-repeat: repeat;
+            background-size: 400px;
+            position: relative;
+        }
+        
+        /* Adding overlay to ensure text readability */
+        .about-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(249, 249, 249, 0.85);
+            z-index: 1;
+        }
+        
+        .about-section h2 {
+            font-size: 2.5em;
+            color: var(--color-primario);
+            margin-bottom: 30px;
+            font-weight: 700;
+            /* Ensuring text appears above overlay */
+            position: relative;
+            z-index: 2;
+        }
+        .about-content {
+            max-width: 900px;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            gap: 25px;
+            /* Ensuring text appears above overlay */
+            position: relative;
+            z-index: 2;
+        }
+        .about-paragraph {
+            font-size: 1.1em;
+            color: var(--color-texto-claro);
+            line-height: 1.8;
+            text-align: justify;
+        }
+        .about-highlight {
+            color: var(--color-secundario);
+            font-weight: 600;
+        }
+        /* Added footer styling */
+        .footer {
+            background-color: var(--color-primario);
+            color: var(--color-blanco);
+            text-align: center;
+            padding: 20px 5%;
+            margin-top: auto;
+        }
+        .footer p {
+            margin: 0;
+            font-size: 0.95em;
+        }
+        /* Responsividad para tablets */
+        @media (max-width: 1024px) {
+            .contenido-imagen {
+                padding: 30px 5%;
+            }
+        }
+        /* Responsividad para móviles */
+        @media (max-width: 768px) {
+            .header {
+                padding: 15px 5%;
+                flex-direction: column;
+                gap: 15px;
+                min-height: auto;
+            }
+            
+            /* Ajustes responsivos para el contenedor del logo */
+            .logo-container {
+                flex-direction: column;
+                gap: 10px;
+            }
+            
+            .header-buttons {
+                gap: 10px;
+            }
+            /* Ajustes responsivos para la sección de información de la empresa */
+            .about-section h2 {
+                font-size: 1.8em;
+            }
+            .about-paragraph {
+                font-size: 1em;
+                text-align: left;
+            }
+        }
+        @media (max-width: 480px) {
+            .logo {
+                height: 70px;
+            }
+            .header-buttons {
+                flex-direction: column;
+                width: 100%;
+                align-items: center;
+            }
+            .header-buttons a {
+                width: 100%;
+                justify-content: center;
+            }
+            /* Ajustes responsivos para la sección de información de la empresa */
+            .about-section {
+                padding: 40px 5%;
+            }
+            .about-section h2 {
+                font-size: 1.5em;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<!-- Encabezado con logo y botones de navegación -->
+<header class="header">
+    <div class="logo-container">
+
+    <!-- Logo -->
+    <img src="{{ url_for('static', filename='images/logo.png') }}" alt="Logo" class="logo">
+    
+    <!-- Botón Ver Catálogo al lado derecho del logo -->
+    <a href="{{ url_for('public.catalogo_publico') }}" class="btn-catalogo">
+        Ver catálogo
+    </a>
+
+</div>
+
+    <!-- Botones de navegación para login y registro -->
+    <div class="header-buttons">
+        <a href="{{ url_for('auth.login') }}"><i class="fas fa-sign-in-alt"></i> Iniciar sesión</a>
+        <a href="{{ url_for('auth.registro') }}"><i class="fas fa-user-plus"></i> Registrarse</a>
+    </div>
+</header>
+
+<!-- Contenido principal con la imagen central -->
+<div class="contenido-imagen">
+    <div class="imagen-sola">
+        <img src="{{ url_for('static', filename='images/Aww.png') }}" alt="Galletas Crackly Happy">
+    </div>
+</div>
+
+<!-- Added company information section -->
+<section class="about-section">
+    <h2>Somos Constructores de Sorpresas</h2>
+    <div class="about-content">
+        <p class="about-paragraph">
+            <span class="about-highlight">Crackly Happy</span> nace en el 2004 de recordar esa experiencia mágica que se siente cuando se abre una Galleta de la Fortuna / Fortune Cookie. Comenzamos creando un producto lleno de curiosidad y diversión. Y un concepto: <span class="about-highlight">Fortunitas</span> son más que galletas con mensajes en su interior, son mensajes dentro de galletas que hacen alusión a su slogan: <span class="about-highlight">"Las galletas que conversan".</span>
+        </p>
+        <p class="about-paragraph">
+            Poco a poco, con amor y creatividad, fuimos desarrollando nuevos productos llenos de personalidad y con un alto nivel comunicacional. <span class="about-highlight">"Productos que hablan"</span>, todos, enfocados a transmitir mensajes de forma divertida.
+        </p>
+        <p class="about-paragraph">
+            En Crackly Happy somos apasionados, disfrutamos y amamos lo que hacemos, somos emprendedores, creativos y soñadores incansables. Tenemos la fortuna de sacar sonrisas y crear experiencias en los demás. Día a día soñamos increíbles sorpresas, las amamos, pensamos, contemplamos y desarrollamos, hasta llevarlas a las manos de las personas, para que ellas a su vez, después de disfrutarlas las compartan con alguien más.
+        </p>
+    </div>
+</section>
+
+<!-- Added footer -->
+<footer class="footer">
+    <p>&copy; 2025 Crackly Happy. Todos los derechos reservados. | "Las galletas que conversan"</p>
+</footer>
+
+</body>
+</html>

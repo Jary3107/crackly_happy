@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Carrito</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <style>
+        body {
+            background: #f4f7fb;
+            font-family: "Segoe UI", Arial, sans-serif;
+        }
+
+        /* Botón volver */
+        .btn-volver-catalogo {
+            position: fixed;
+            top: 15px;
+            left: 15px;
+            background: #bb1b0c;
+            color: white;
+            padding: 10px 18px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: bold;
+            z-index: 1000;
+        }
+
+        .btn-volver-catalogo:hover {
+            background: #a11308;
+        }
+
+        /* Título */
+        .linea-titulo {
+            font-size: 1.8rem;
+            margin: 30px 0 20px 0;
+            color: white;
+            font-weight: 700;
+            padding: 12px 22px;
+            background: #bb1b0c;
+            border-left: 10px solid #a11308;
+            border-radius: 8px;
+            display: inline-block;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+        }
+
+        /* Tarjeta del producto */
+        .carrito-card {
+            background: white;
+            border-radius: 16px;
+            padding: 15px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+            transition: 0.2s;
+        }
+
+        .carrito-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 18px rgba(0,0,0,0.15);
+        }
+
+        .producto-img {
+            height: 120px;
+            width: 100%;
+            object-fit: contain;
+        }
+
+        .precio {
+            color: #0d3c83;
+            font-weight: 700;
+            font-size: 1.2rem;
+        }
+
+        .resumen-card {
+            background: white;
+            border-radius: 18px;
+            padding: 20px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.15);
+        }
+
+        .btn-actualizar {
+            background: #0d3c83;
+            color: white;
+        }
+
+        .btn-eliminar {
+            background: #bb1b0c;
+            color: white;
+            border: none;
+        }
+
+        .btn-eliminar:hover {
+            background: #a11308;
+        }
+
+        .btn-finalizar {
+            background: #0d3c83;
+            color: white;
+            font-size: 1.1rem;
+            padding: 12px;
+            border-radius: 10px;
+        }
+
+        .btn-finalizar:hover {
+            background: #072e5c;
+        }
+        .btn-azul {
+    background-color: #0d3c83 !important;
+    border-color: #0d3c83 !important;
+    color: #fff !important;
+}
+.btn-azul:hover {
+    background-color: #0b326f !important;
+    border-color: #0b326f !important;
+}
+    </style>
+
+</head>
+<body>
+
+<a href="{{ url_for('cliente.dashboard') }}" 
+   class="btn-volver-catalogo">
+     Volver
+</a>
+
+<div class="container py-4">
+     <!-- MENSAJES FLASH -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        {% for category, message in messages %}
+          <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+          </div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+
+    <h2 class="linea-titulo">🛒 Tu carrito</h2>
+
+    {% if carrito and carrito|length > 0 %}
+
+    <div class="row">
+        <!-- LISTA DE PRODUCTOS -->
+        <div class="col-md-8">
+
+            {% for item in carrito %}
+            <div class="carrito-card mb-4">
+
+                <div class="row align-items-center">
+
+                    <!-- Imagen -->
+                    <div class="col-3">
+                        <img src="{{ url_for('static', filename='imagenes_productos/' ~ (item.imagen or 'default.png')) }}"
+                             class="producto-img">
+                    </div>
+
+                    <!-- Información -->
+                    <div class="col-9">
+
+                        <h5 class="fw-bold">{{ item.nombre }}</h5>
+                        <p class="text-muted small">{{ item.descripcion }}</p>
+
+                        <p class="precio">Precio: ${{ "{:,.0f}".format(item.precio) }}</p>
+
+                        <!-- ACTUALIZAR CANTIDAD -->
+                        <form method="POST" action="{{ url_for('cliente.actualizar_cantidad') }}" class="d-flex align-items-center">
+
+                            <input type="hidden" name="producto_id" value="{{ item.producto_id }}">
+
+                            <button class="btn btn-outline-secondary" name="action" value="restar">−</button>
+
+                            <input type="number" name="cantidad" value="{{ item.cantidad }}"
+                                   class="form-control mx-2" min="1" style="width: 70px;">
+
+                            <button class="btn btn-outline-secondary" name="action" value="sumar">+</button>
+
+                            <button type="submit" class="btn btn-actualizar ms-3">Actualizar</button>
+
+                        </form>
+
+                        <a href="{{ url_for('cliente.eliminar_item', producto_id=item.producto_id) }}"
+                           class="btn btn-eliminar mt-2">
+                           Eliminar
+                        </a>
+
+                        <p class="mt-2">
+                            Subtotal:
+                            <strong>${{ "{:,.0f}".format(item.precio * item.cantidad) }}</strong>
+                        </p>
+
+                    </div>
+                </div>
+
+            </div>
+            {% endfor %}
+
+        </div>
+
+        <!-- RESUMEN -->
+        <div class="col-md-4">
+            <div class="resumen-card">
+
+                <h4 class="mb-3">Resumen del pedido</h4>
+
+                <p>Productos: <strong>{{ carrito|length }}</strong></p>
+                <p>Subtotal: <strong>${{ "{:,.0f}".format(total) }}</strong></p>
+
+                <hr>
+
+                <h5>Datos del cliente</h5>
+                <p class="mb-1">{{ datos_cliente.nombre }}</p>
+                <p class="mb-1">{{ datos_cliente.telefono }}</p>
+                <p>{{ datos_cliente.direccion }} – {{ datos_cliente.ciudad }}</p>
+
+                <a href="{{ url_for('cliente.mostrar_finalizar_pedido') }}"
+                   class="btn btn-finalizar w-100 mt-3">
+                   Finalizar pedido
+                </a>
+
+            </div>
+        </div>
+
+    </div>
+
+    {% else %}
+    <div class="alert alert-info mt-4">Tu carrito está vacío</div>
+    <a class="btn btn-azul" href="{{ url_for('cliente.catalogo_cliente') }}">
+    Ver productos
+</a>
+    {% endif %}
+
+</div>
+
+</body>
+</html>
+

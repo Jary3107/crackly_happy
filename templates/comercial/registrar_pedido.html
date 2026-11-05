@@ -1,0 +1,501 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registrar Pedido</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            padding: 2rem 0;
+        }
+        .form-container {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            padding: 2rem;
+            margin-bottom: 2rem;
+        }
+        .section-title {
+            color: #0d3c83; /* Azul original */
+            border-bottom: 2px solid #bb1b0c; /* Azul original */
+            padding-bottom: 0.5rem;
+            margin-bottom: 1.5rem;
+            font-weight: 600;
+        }
+        .btn-back {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            z-index: 1000;
+            background-color: #bb1b0c; /* Fondo rojo */
+            color: black; /* Texto negro */
+            border: none;
+        }
+        .btn-back:hover {
+            background-color: #bb1b0c; /* Rojo más oscuro al pasar el mouse */
+            color: black; /* Texto negro */
+        }
+        .required-field::after {
+            content: " *";
+            color: #bb1b0c;
+        }
+        .cliente-toggle {
+            background: #bb1b0c; /* Cambiado a rojo */
+            color: white; /* Texto blanco para mejor contraste */
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+        }
+        .cliente-toggle .form-check-label {
+            color: white; /* Texto blanco para mejor contraste */
+        }
+        .hidden {
+            display: none;
+        }
+        .btn-primary {
+            background-color: #0d3c83; /* Cambiado a azul (#0d3c83) */
+            border-color: #0d3c83; /* Cambiado a azul (#0d3c83) */
+            color: white; /* Texto blanco para mejor contraste */
+        }
+        .btn-primary:hover {
+            background-color: #0a2f6c; /* Azul más oscuro al pasar el mouse */
+            border-color: #0a2f6c; /* Azul más oscuro al pasar el mouse */
+        }
+    </style>
+</head>
+<body>
+    <a href="{{ url_for('comercial.dashboard') }}" class="btn btn-back">
+        <i class="fas fa-arrow-left"></i> Volver
+    </a>
+
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-10">
+                <div class="form-container">
+                    <h2 class="text-center mb-4" style="color: #0d3c83;"> <!-- Cambiado a azul (#0d3c83) -->
+                        <i class="fas fa-file-invoice"></i> Registrar Nuevo Pedido
+                    </h2>
+
+                    {% with messages = get_flashed_messages(with_categories=true) %}
+                        {% if messages %}
+                            {% for category, message in messages %}
+                                <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert" id="flash-message-{{ loop.index }}">
+                                    {{ message }}
+                                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                                </div>
+                            {% endfor %}
+                        {% endif %}
+                    {% endwith %}
+
+                    <form method="POST" action="{{ url_for('comercial.guardar_pedido') }}" id="pedidoForm">
+                        
+
+                        <h4 class="section-title"><i class="fas fa-user"></i> Información del Cliente</h4>
+                        
+                        <div class="cliente-toggle">
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="tipo_cliente_seleccion" id="cliente_existente" value="existente" checked>
+                                <label class="form-check-label" for="cliente_existente">
+                                    <strong>Cliente Existente</strong>
+                                </label>
+                            </div>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="tipo_cliente_seleccion" id="cliente_nuevo" value="nuevo">
+                                <label class="form-check-label" for="cliente_nuevo">
+                                    <strong>Nuevo Cliente</strong>
+                                </label>
+                            </div>
+                        </div>
+
+                        <div id="seccion_cliente_existente">
+                            <div class="row mb-3">
+                                <div class="col-md-12">
+                                    <label class="form-label required-field">Cliente / Razón Social</label>
+                                    <select class="form-select" name="id_cliente" id="select_cliente" required>
+                                        <option value="">Seleccione un cliente</option>
+                                        {% for cliente in clientes %}
+                                            <option value="{{ cliente.id_cliente }}">
+                                                {{ cliente.razon_social }} ({{ cliente.tipo_cliente }})
+                                            </option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div id="seccion_cliente_nuevo" class="hidden">
+                            <div class="row mb-3">
+                                <div class="col-md-6">
+                                    <label class="form-label required-field">Razón Social / Nombre</label>
+                                    <input type="text" class="form-control" name="nueva_razon_social" id="nueva_razon_social">
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label required-field">NIT / CC</label>
+                                    <input type="text" class="form-control" name="nuevo_nit_cc" id="nuevo_nit_cc">
+                                </div>
+                            </div>
+                            <div class="row mb-3">
+                                <div class="col-md-6">
+                                    <label class="form-label required-field">Tipo de Cliente</label>
+                                    <select class="form-select" name="nuevo_tipo_cliente" id="nuevo_tipo_cliente">
+                                        <option value="">Seleccione</option>
+                                        <option value="Empresa">Empresa</option>
+                                        <option value="Persona">Persona</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label required-field">Ciudad</label>
+                                    <input type="text" class="form-control" name="nueva_ciudad" id="nueva_ciudad">
+                                </div>
+                            </div>
+                            <div class="row mb-3">
+                                <div class="col-md-12">
+                                    <label class="form-label required-field">Dirección</label>
+                                    <input type="text" class="form-control" name="nueva_direccion" id="nueva_direccion">
+                                </div>
+                            </div>
+                            <div class="row mb-3">
+                                <div class="col-md-6">
+                                    <label class="form-label required-field">Teléfono</label>
+                                    <input type="text" class="form-control" name="nuevo_telefono" id="nuevo_telefono">
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">Correo Electrónico</label>
+                                    <input type="email" class="form-control" name="nuevo_correo" id="nuevo_correo">
+                                </div>
+                            </div>
+                            <div class="row mb-3">
+                                <div class="col-md-6">
+                                    <label class="form-label">Nombre de Contacto</label>
+                                    <input type="text" class="form-control" name="nuevo_contacto" id="nuevo_contacto">
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">Teléfono de Contacto</label>
+                                    <input type="text" class="form-control" name="nuevo_telefono_contacto" id="nuevo_telefono_contacto">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-md-12">
+                                <label class="form-label required-field">Nombre del Pedido</label>
+                                <input type="text" class="form-control" name="nombre_pedido" required>
+                            </div>
+                        </div>
+
+                        <h4 class="section-title mt-4"><i class="fas fa-clipboard-list"></i> Información del Pedido</h4>
+                        <div class="row mb-3">
+                            <div class="col-md-4">
+                                <label class="form-label required-field">Fecha del Pedido</label>
+                                <input type="date" class="form-control" name="fecha_pedido" required>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label required-field">Ciudad de Entrega</label>
+                                <input type="text" class="form-control" name="ciudad_entrega" required>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">Fecha de Salida</label>
+                                <input type="date" class="form-control" name="fecha_salida">
+                            </div>
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-md-12">
+                                <label class="form-label required-field">Dirección de Entrega</label>
+                                <input type="text" class="form-control" name="direccion_entrega" required>
+                            </div>
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-md-4">
+                                <label class="form-label required-field">Forma de Pago</label>
+                                <select class="form-select" name="forma_pago" required>
+                                    <option value="">Seleccione</option>
+                                    <option value="Contado">Contado</option>
+                                    <option value="Crédito">Crédito</option>
+                                </select>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label required-field">Valor Total</label>
+                                <input type="number" step="0.01" class="form-control" name="valor_total" id="valor_total" readonly style="background-color: #e9ecef;">
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">Recibo de Pago</label>
+                                <select class="form-select" name="recibo_pago">
+                                    <option value="No">No</option>
+                                    <option value="Sí">Sí</option>
+                                    <option value="Crédito">Crédito</option>
+                                </select>
+                            </div>
+                        </div>
+
+
+                        <h4 class="section-title mt-4"><i class="fas fa-box"></i> Producto y Detalles</h4>
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label class="form-label required-field">Línea de Producto</label>
+                                <select class="form-select" id="linea_producto" name="id_linea">
+                                    <option value="">Seleccione una línea</option>
+                                    {% for linea in lineas_producto %}
+                                        <option value="{{ linea.id_linea }}">{{ linea.nombre_linea }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label required-field">Producto</label>
+                                <select class="form-select" name="id_producto" id="producto" required>
+                                    <option value="">Seleccione un producto</option>
+                                    {% for producto in productos %}
+                                        <option value="{{ producto.id_producto }}" data-linea="{{ producto.id_linea }}" data-precio="{{ producto.precio }}">
+                                            {{ producto.nombre_producto }} - ${{ producto.precio }}
+                                        </option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label class="form-label required-field">Cantidad</label>
+                                <input type="number" class="form-control" name="cantidad" id="cantidad" min="1" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Ventaja (cantidad extra)</label>
+                                <input type="number" class="form-control" name="ventaja" min="0" value="0">
+                            </div>
+                        </div>
+
+                        <h4 class="section-title mt-4"><i class="fas fa-comment-dots"></i> Mensajes y Personalización</h4>
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label class="form-label">Tiro Mensajes (Frontal)</label>
+                                <textarea class="form-control" name="tiro_mensaje" rows="3"></textarea>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Retiro Mensajes (Trasera)</label>
+                                <textarea class="form-control" name="retiro_mensaje" rows="3"></textarea>
+                            </div>
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-md-3">
+                                <label class="form-label">Mensajes Mezclados</label>
+                                <select class="form-select" name="mensajes_mezclados">
+                                    <option value="No">No</option>
+                                    <option value="Sí">Sí</option>
+                                </select>
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label">Inserto</label>
+                                <select class="form-select" name="inserto">
+                                    <option value="No">No</option>
+                                    <option value="Sí">Sí</option>
+                                </select>
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label">Empaque</label>
+                                <input type="text" class="form-control" name="empaque">
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label">Cenefa</label>
+                                <select class="form-select" name="cenefa">
+                                    <option value="No">No</option>
+                                    <option value="Sí">Sí</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <h4 class="section-title mt-4"><i class="fas fa-shipping-fast"></i> Información de Envío</h4>
+                        <div class="row mb-3">
+                            <div class="col-md-4">
+                                <label class="form-label required-field">Sale Vía</label>
+                                <select class="form-select" name="sale_via" id="sale_via" required>
+                                    <option value="">Seleccione</option>
+                                    <option value="Transportadora">Transportadora</option>
+                                    <option value="Mensajero">Mensajero</option>
+                                    <option value="Recogen">Recogen</option>
+                                </select>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label" id="label_transportadora">Transportadora</label>
+                                <input type="text" class="form-control" name="transportadora" id="transportadora" placeholder="Ej: TCC, Servientrega">
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label required-field">Costo de Envío</label>
+                                <input type="number" class="form-control" name="costo_envio" id="costo_envio" min="0" step="0.01" value="0" required>
+                            </div>
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label class="form-label">Pago de Flete</label>
+                                <select class="form-select" name="pago_flete">
+                                    <option value="Cliente">Cliente (Contra entrega)</option>
+                                    <option value="Empresa">Crackly Happy</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Nombre de quien Recibe</label>
+                                <input type="text" class="form-control" name="nombre_receptor">
+                            </div>
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label class="form-label">Teléfono de quien Recibe</label>
+                                <input type="text" class="form-control" name="telefono_receptor">
+                            </div>
+
+                        <h4 class="section-title mt-4"><i class="fas fa-sticky-note"></i> Observaciones</h4>
+                        <div class="row mb-3">
+                            <div class="col-md-12">
+                                <label class="form-label">Observaciones Generales del Pedido</label>
+                                <textarea class="form-control" name="observaciones" rows="3"></textarea>
+                            </div>
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-md-12">
+                                <label class="form-label">Observaciones del Detalle del Producto</label>
+                                <textarea class="form-control" name="observacion_detalle" rows="2"></textarea>
+                            </div>
+                        </div>
+
+                        <div class="row mt-4">
+                            <div class="col-12 text-center">
+                                <button type="submit" class="btn btn-primary btn-lg px-5">
+                                    <i class="fas fa-save"></i> Registrar Pedido
+                                </button>
+                                <a href="{{ url_for('comercial.dashboard') }}" class="btn btn-secondary btn-lg px-5 ms-3">
+                                    <i class="fas fa-times"></i> Cancelar
+                                </a>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const flashMessages = document.querySelectorAll('[id^="flash-message-"]');
+            flashMessages.forEach(function(message) {
+                setTimeout(function() {
+                    const bsAlert = new bootstrap.Alert(message);
+                    bsAlert.close();
+                }, 10000); // 10 seconds
+            });
+        });
+
+        const radioExistente = document.getElementById('cliente_existente');
+        const radioNuevo = document.getElementById('cliente_nuevo');
+        const seccionExistente = document.getElementById('seccion_cliente_existente');
+        const seccionNuevo = document.getElementById('seccion_cliente_nuevo');
+        const selectCliente = document.getElementById('select_cliente');
+        
+        // Campos del nuevo cliente
+        const camposNuevoCliente = [
+            'nueva_razon_social', 'nuevo_nit_cc', 'nuevo_tipo_cliente',
+            'nueva_ciudad', 'nueva_direccion', 'nuevo_telefono'
+        ];
+
+        function toggleClienteSections() {
+            if (radioExistente.checked) {
+                seccionExistente.classList.remove('hidden');
+                seccionNuevo.classList.add('hidden');
+                selectCliente.required = true;
+                
+                // Remover required de campos de nuevo cliente
+                camposNuevoCliente.forEach(id => {
+                    const campo = document.getElementById(id);
+                    if (campo) campo.required = false;
+                });
+            } else {
+                seccionExistente.classList.add('hidden');
+                seccionNuevo.classList.remove('hidden');
+                selectCliente.required = false;
+                selectCliente.value = '';
+                
+                // Agregar required a campos de nuevo cliente
+                camposNuevoCliente.forEach(id => {
+                    const campo = document.getElementById(id);
+                    if (campo) campo.required = true;
+                });
+            }
+        }
+
+        radioExistente.addEventListener('change', toggleClienteSections);
+        radioNuevo.addEventListener('change', toggleClienteSections);
+
+        const selectProducto = document.getElementById('producto');
+        const inputCantidad = document.getElementById('cantidad');
+        const inputCostoEnvio = document.getElementById('costo_envio');
+        const inputValorTotal = document.getElementById('valor_total');
+
+        function calcularValorTotal() {
+            const productoSeleccionado = selectProducto.options[selectProducto.selectedIndex];
+            const precio = parseFloat(productoSeleccionado.getAttribute('data-precio')) || 0;
+            const cantidad = parseInt(inputCantidad.value) || 0;
+            const costoEnvio = parseFloat(inputCostoEnvio.value) || 0;
+            const total = (precio * cantidad) + costoEnvio;
+            inputValorTotal.value = total.toFixed(2);
+        }
+
+        selectProducto.addEventListener('change', calcularValorTotal);
+        inputCantidad.addEventListener('input', calcularValorTotal);
+        inputCostoEnvio.addEventListener('input', calcularValorTotal);
+
+        // Filtrar productos por línea seleccionada
+        document.getElementById('linea_producto').addEventListener('change', function() {
+            const lineaSeleccionada = this.value;
+            const opciones = selectProducto.querySelectorAll('option');
+            
+            opciones.forEach(opcion => {
+                if (opcion.value === '') {
+                    opcion.style.display = 'block';
+                    return;
+                }
+                
+                const lineaProducto = opcion.getAttribute('data-linea');
+                if (lineaSeleccionada === '' || lineaProducto === lineaSeleccionada) {
+                    opcion.style.display = 'block';
+                } else {
+                    opcion.style.display = 'none';
+                }
+            });
+            
+            selectProducto.value = '';
+            inputValorTotal.value = '';
+        });
+
+        const labelTransportadora = document.getElementById('label_transportadora');
+        document.getElementById('sale_via').addEventListener('change', function() {
+            const transportadora = document.getElementById('transportadora');
+            if (this.value === 'Transportadora') {
+                transportadora.required = true;
+                transportadora.disabled = false;
+                labelTransportadora.classList.add('required-field');
+            } else {
+                transportadora.required = false;
+                transportadora.disabled = true;
+                transportadora.value = '';
+                labelTransportadora.classList.remove('required-field');
+            }
+        });
+
+        // Establecer fecha actual por defecto
+        document.addEventListener('DOMContentLoaded', function() {
+            const fechaPedido = document.querySelector('input[name="fecha_pedido"]');
+            const hoy = new Date().toISOString().split('T')[0];
+            fechaPedido.value = hoy;
+        });
+    </script>
+</body>
+</html>

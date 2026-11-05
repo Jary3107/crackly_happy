@@ -1,0 +1,23 @@
+# Entorno virtual
+.venv/
+venv/
+env/
+
+# Caché de Python
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Variables de entorno y credenciales privadas
+.env
+*.env
+
+# Facturas generadas temporalmente
+static2/facturas/*.pdf
+
+# Archivos del sistema / IDE
+desktop.ini
+.DS_Store
+.vscode/
+.idea/
+pip

@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <!-- Metadatos y enlaces a fuentes, estilos y responsividad -->
+    <meta charset="UTF-8">
+    <title>Iniciar Sesión | Crackly Happy</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    
+    <!-- Cabeceras para deshabilitar caché -->
+    <meta http-equiv="Cache-Control" content="no-store" />
+    <meta http-equiv="Pragma" content="no-cache" />
+    <meta http-equiv="Expires" content="0" />
+
+    <style>
+        /* Variables CSS para colores, sombras y transiciones */
+        :root {
+            --color-primario: #0d3c83;
+            --color-secundario: #bb1b0c;
+            --color-texto: #ff0000;
+            --color-texto-claro: #555;
+            --color-error: #e74a3b;
+            --color-exito: #1cc88a;
+            --color-advertencia: #f6c23e;
+            --color-fondo: #f0f8f9;
+            --color-blanco: #ffffff;
+            --sombra: 0 4px 20px rgba(0, 0, 0, 0.1);
+            --sombra-input: 0 2px 10px rgba(0, 0, 0, 0.05);
+            --transicion: all 0.3s ease;
+        }
+         
+        .back-btn {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    z-index: 100;
+}
+.back-btn a {
+    color: #000000; /* Texto negro */
+    text-decoration: none;
+    font-weight: 700; /* Negrito - 700 es bold */
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 15px;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+    background-color: #bb1b0c; /* Fondo blanco semitransparente */
+}
+.back-btn a:hover {
+    color: #000000; /* Texto blanco en hover para mejor contraste */
+    text-decoration: none;
+}
+        /* Estilos generales del body y centrado del login */
+        body {
+            margin: 0;
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--color-fondo);
+            color: var(--color-texto);
+            line-height: 1.6;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background-image: linear-gradient(135deg, #f5f7fa 0%, #e4e9f2 100%);
+            padding: 20px;
+        }
+
+        .login-wrapper {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 100%;
+            min-height: 100vh;
+        }
+
+        .centrado {
+            width: 100%;
+            max-width: 450px;
+            animation: fadeIn 0.6s ease;
+        }
+
+        /* Contenedor principal del login */
+        .login-container {
+            background-color: var(--color-blanco);
+            border-radius: 20px;
+            padding: 40px 35px;
+            box-shadow: var(--sombra);
+            position: relative;
+            overflow: hidden;
+            text-align: center;
+        }
+
+        /* Barra superior decorativa */
+        .login-container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 5px;
+            background: linear-gradient(90deg, var(--color-primario), var(--color-secundario));
+        }
+
+        /* Logo de la empresa */
+        .login-logo {
+            margin-bottom: 25px;
+        }
+
+        .login-logo img {
+            height: 80px;
+            width: auto;
+            margin-bottom: 15px;
+        }
+
+        /* Título del formulario */
+        .login-container h2 {
+            color: var(--color-primario);
+            margin-bottom: 25px;
+            font-weight: 600;
+            font-size: 28px;
+        }
+
+        /* Formulario y campos */
+        form {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .form-group {
+            text-align: left;
+        }
+
+        label {
+            font-weight: 500;
+            color: var(--color-primario);
+            margin-bottom: 8px;
+            display: block;
+        }
+
+        input {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #e3e6f0;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: var(--transicion);
+            box-shadow: var(--sombra-input);
+            box-sizing: border-box;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: var(--color-primario);
+            box-shadow: 0 0 0 3px rgba(23, 98, 109, 0.1);
+        }
+
+        small {
+            color: var(--color-texto-claro);
+            font-size: 0.85em;
+            margin-top: 5px;
+            display: block;
+        }
+
+        /* Botón de envío */
+        button {
+            background-color: var(--color-primario);
+            color: var(--color-blanco);
+            border: none;
+            padding: 16px;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: var(--transicion);
+            margin-top: 10px;
+            box-shadow: 0 4px 15px rgba(23, 98, 109, 0.3);
+            width: 100%;
+        }
+
+        button:hover {
+            background-color: #09326e;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(23, 98, 109, 0.4);
+        }
+
+        /* Enlace para recuperar contraseña */
+        .forgot-password {
+            text-align: center;
+            margin-top: 15px;
+        }
+
+        .forgot-password a {
+            color: var(--color-secundario);
+            text-decoration: none;
+            font-weight: 500;
+            transition: var(--transicion);
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 14px;
+        }
+
+        .forgot-password a:hover {
+            color: #bb1b0c;
+            text-decoration: underline;
+        }
+
+        /* Enlace para registro */
+        .register-link {
+            text-align: center;
+            margin-top: 25px;
+            color: var(--color-texto-claro);
+            font-size: 14px;
+        }
+
+        .register-link a {
+            color: var(--color-secundario);
+            text-decoration: none;
+            font-weight: 500;
+            transition: var(--transicion);
+        }
+
+        .register-link a:hover {
+            color: #bb1b0c;
+            text-decoration: underline;
+        }
+
+        /* Mensajes flash de error, éxito o advertencia */
+        .flashes {
+            list-style: none;
+            padding: 0;
+            margin: 0 0 25px 0;
+        }
+
+        .flashes li {
+            padding: 12px 20px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            animation: slideIn 0.3s ease;
+            justify-content: center;
+            text-align: center;
+        }
+
+        .flashes li::before {
+            font-family: "Font Awesome 6 Free";
+            font-weight: 900;
+            font-size: 16px;
+        }
+
+        .error {
+            background-color: rgba(231, 74, 59, 0.1);
+            color: var(--color-error);
+            border-left: 4px solid var(--color-error);
+        }
+
+        .error::before {
+            content: "\f06a";
+        }
+
+        .success {
+            background-color: rgba(28, 200, 138, 0.1);
+            color: var(--color-exito);
+            border-left: 4px solid var(--color-exito);
+        }
+
+        .success::before {
+            content: "\f058";
+        }
+
+        .warning {
+            background-color: rgba(246, 194, 62, 0.1);
+            color: var(--color-advertencia);
+            border-left: 4px solid var(--color-advertencia);
+        }
+
+        .warning::before {
+            content: "\f071";
+        }
+
+        /* Animaciones para la entrada del formulario y mensajes */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        /* Responsividad para tablets y móviles */
+        @media (max-width: 768px) {
+            .centrado {
+                max-width: 400px;
+                padding: 15px;
+            }
+            
+            .login-container {
+                padding: 30px 25px;
+            }
+            
+            .login-container h2 {
+                font-size: 24px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .login-container {
+                padding: 25px 20px;
+            }
+            
+            .login-container h2 {
+                font-size: 22px;
+            }
+            
+            input, button {
+                padding: 14px;
+            }
+            
+            .login-logo img {
+                height: 65px;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="back-btn">
+        <a href="/" id="backButton">
+            <i class="fas fa-arrow-left"></i>Volver
+        </a>
+    </div>
+<div class="login-wrapper">
+    <div class="centrado">               
+        <div class="login-container">
+            <!-- Logo de la empresa -->
+            <div class="login-logo">
+                <img src="{{ url_for('static', filename='images/logo.png') }}" alt="Logo Hospital en Casa">
+            </div>
+
+            <!-- Título del formulario -->
+            <h2>Iniciar Sesión</h2>
+
+            <!-- Mensajes flash de error, éxito o advertencia -->
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    <ul class="flashes" id="flash-messages">
+                        {% for category, message in messages %}
+                            <li class="{{ category }}">{{ message }}</li>
+                        {% endfor %}
+                    </ul>
+                {% endif %}
+            {% endwith %}
+
+            <!-- Formulario de login -->
+            <form action="{{ url_for('auth.login') }}" method="POST">
+                <div class="form-group">
+                    <label for="correo">Correo electrónico:</label>
+                    <input type="email" name="correo" id="correo" required placeholder="usuario@ejemplo.com">
+                    <small>Debes ingresar un correo válido</small>
+                </div>
+
+                <div class="form-group">
+                    <label for="contrasena">Contraseña:</label>
+                    <input type="password" name="contrasena" id="contrasena" required placeholder="••••••••">
+                </div>
+
+                <button type="submit">
+                    <i class="fas fa-sign-in-alt"></i> Iniciar sesión
+                </button>
+                
+                <!-- Enlace para recuperar contraseña -->
+                <div class="forgot-password">
+                    <a href="{{ url_for('auth.recuperar_contrasena') }}">
+                        <i class="fas fa-key"></i> ¿Olvidaste tu contraseña?
+                    </a>
+                </div>
+            </form>
+
+            <!-- Enlace para registro de usuario -->
+            <p class="register-link">¿No tienes cuenta? <a href="{{ url_for('auth.registro') }}">Regístrate aquí</a></p>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const fromPage = urlParams.get('from');
+        const backButton = document.getElementById('backButton');
+        
+        if (fromPage === 'catalog') {
+            backButton.href = '/catalogo';
+        } else {
+            backButton.href = '/';
+        }
+        
+        console.log('[v0] From page:', fromPage);
+        console.log('[v0] Back button href set to:', backButton.href);
+    });
+
+    window.addEventListener("DOMContentLoaded", () => {
+        const flash = document.getElementById("flash-messages");
+
+        if (flash) {
+            setTimeout(() => {
+                flash.style.transition = "opacity 0.5s ease";
+                flash.style.opacity = 0;
+                setTimeout(() => flash.remove(), 10000); // 10 segundos para el fade out
+            }, 10000); // 10 segundos de espera antes de empezar a desaparecer
+        }
+    });
+
+    if (window.history && window.history.pushState) {
+        window.history.pushState(null, "", window.location.href);
+        
+        window.onpopstate = function(event) {
+            window.location.href = "{{ url_for('inicio') }}";
+        };
+    }
+
+    window.addEventListener("pageshow", function(event) {
+        if (event.persisted) {
+            window.location.reload();
+        }
+    });
+
+    document.querySelector('form').addEventListener('submit', function(e) {
+        const submitBtn = this.querySelector('button[type="submit"]');
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Iniciando sesión...';
+    });
+</script>
+</body>
+</html>
